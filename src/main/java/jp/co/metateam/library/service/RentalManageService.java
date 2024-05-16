@@ -78,11 +78,6 @@ public class RentalManageService {
     @Transactional 
     public void update(Long id, RentalManageDto rentalManageDto) throws Exception {
         try {
-            RentalManage rentalManage = this.rentalManageRepository.findById(id).orElse(null);
-            if (rentalManage == null) {
-                throw new Exception("RentalManage record not found.");
-            }
-
             Account account = this.accountRepository.findByEmployeeId(rentalManageDto.getEmployeeId()).orElse(null);
             if (account == null) {
                 throw new Exception("Account not found.");
@@ -93,9 +88,10 @@ public class RentalManageService {
                 throw new Exception("Stock not found.");
             }
 
-            rentalManage = setRentalStatusDate(rentalManage, rentalManageDto.getStatus());
             
-            rentalManageDto.setId(rentalManage.getId());
+
+            RentalManage rentalManage = findById(id);
+            
             rentalManage.setAccount(account);
             rentalManage.setExpectedRentalOn(rentalManageDto.getExpectedRentalOn());
             rentalManage.setExpectedReturnOn(rentalManageDto.getExpectedReturnOn());

@@ -1,6 +1,8 @@
 package jp.co.metateam.library.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
@@ -71,4 +73,15 @@ public class RentalManageDto {
     private Stock stock;
 
     private Account account;
+
+       
+    public void dateCheck() throws Exception {
+        LocalDate expectedRentalOnLocalDate = this.expectedRentalOn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate expectedReturnOnLocalDate = this.expectedReturnOn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+ 
+        if (expectedRentalOnLocalDate.isAfter(expectedReturnOnLocalDate)) {
+            throw new Exception("返却予定日は貸出予定日よりも後に設定してください");
+        }
+   }
+
 }

@@ -142,10 +142,12 @@ public class RentalManageController {
                 result.addError(fieldError);
                 throw new Exception("Validation error.");
             }
-
+           
             if (result.hasErrors()) {
                 throw new Exception("Validation error.");
             }
+
+            rentalManageDto.dateCheck();
             // 変更処理
             rentalManageService.update(id, rentalManageDto);
 
@@ -155,6 +157,7 @@ public class RentalManageController {
 
             ra.addFlashAttribute("rentalManageDto", rentalManageDto);
             ra.addFlashAttribute("org.springframework.validation.BindingResult.rentalManageDto", result);
+            ra.addFlashAttribute("error1", e.getMessage());
 
             List<Account> accountList = this.accountService.findAll();
             List<Stock> stockList = this.stockService.findAll();
@@ -163,7 +166,7 @@ public class RentalManageController {
             model.addAttribute("stockList", stockList);
             model.addAttribute("rentalStatus", RentalStatus.values());
 
-            return "rental/edit";
+            return "redirect:/rental/"+ id +" /edit";
         }
     }
 }
