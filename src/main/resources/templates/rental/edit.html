@@ -24,7 +24,7 @@
                     <div class="mb30">
                         <label class="input_title" for="employeeId">社員番号<span class="text-red asterisk">＊</span></label>
                         <select id="employeeId" class="form_input" name="employeeId" required>
-                            <option value="">社員番号を選択</option>
+                            <!-- <option value="">社員番号を選択</option> -->
                             <option th:each="account : ${accounts}" th:value="${account.employeeId}"
                                 th:text="${account.employeeId + ' ' + account.name}"
                                 th:selected="${account.employeeId == rentalManageDto.employeeId}"></option>
@@ -60,7 +60,7 @@
                         <label class="input_title" for="stockMngNumber">在庫管理番号<span
                                 class="text-red asterisk">＊</span></label>
                         <select id="stockMngNumber" class="form_input" name="stockId" required>
-                            <option value="">在庫管理番号を選択</option>
+                            <!-- <option value="">在庫管理番号を選択</option> -->
                             <option th:each="stock : ${stockList}" th:value="${stock.id}"
                                 th:text="${stock.id + ' ' + stock.bookMst.title}"
                                 th:selected="${stock.id == rentalManageDto.stockId}"></option>
@@ -74,7 +74,7 @@
                         <label class="input_title" for="rentalStatus">貸出ステータス<span
                                 class="text-red asterisk">＊</span></label>
                         <select id="rentalStatus" class="form_input" name="status" required>
-                            <option value="">ステータスを選択</option>
+                            <!-- <option value="">ステータスを選択</option> -->
                             <option th:each="status : ${rentalStatus}" th:value="${status.value}"
                                 th:text="${status.text}" th:selected="${status.value == rentalManageDto.status}">
                             </option>
