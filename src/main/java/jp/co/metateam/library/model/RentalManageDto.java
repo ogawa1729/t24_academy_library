@@ -5,12 +5,19 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Calendar;
+
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jp.co.metateam.library.service.StockService;
 import jp.co.metateam.library.values.RentalStatus;
+import jp.co.metateam.library.values.StockStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -75,13 +82,15 @@ public class RentalManageDto {
     private Account account;
 
        
-    public void dateCheck() throws Exception {
+    public void dateCheck(BindingResult result) throws Exception {
         LocalDate expectedRentalOnLocalDate = this.expectedRentalOn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate expectedReturnOnLocalDate = this.expectedReturnOn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
  
         if (expectedRentalOnLocalDate.isAfter(expectedReturnOnLocalDate)) {
+            FieldError fieldError = new FieldError("rentalManageDto","expectedReturnOn", "返却予定日は貸出予定日よりも後に設定してください");
+                result.addError(fieldError);
             throw new Exception("返却予定日は貸出予定日よりも後に設定してください");
         }
-   }
+    }
 
 }
