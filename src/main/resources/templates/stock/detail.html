@@ -28,17 +28,6 @@
                             <td class="column_title">在庫ステータス</td>
                             <td th:text="*{stock.status == 0 ? '利用可' : '利用不可'}"></td>
                         </tr>
-                        <tr>
-                            <td class="column_title">貸出情報</td>
-                            <td>
-                                <div th:if="${not #lists.isEmpty(stock.rentalManages)}">
-                                    <div th:text="${'利用者：' + stock.rentalManages[0].account.name}"></div>
-                                    <div
-                                        th:text="${'返却予定日：' + #dates.format(stock.rentalManages[0].expectedReturnOn, ('yyyy/MM/dd'))}">
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
                     </table>
                 </div>
                 <div>
