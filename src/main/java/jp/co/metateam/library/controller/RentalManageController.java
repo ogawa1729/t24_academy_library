@@ -1,20 +1,29 @@
 package jp.co.metateam.library.controller;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.LogManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+
 
 import jakarta.validation.Valid;
 
@@ -41,10 +50,7 @@ public class RentalManageController {
     private final StockService stockService;
 
     @Autowired
-    public RentalManageController(
-            AccountService accountService,
-            RentalManageService rentalManageService,
-            StockService stockService) {
+    public RentalManageController(AccountService accountService, RentalManageService rentalManageService, StockService stockService) {
         this.accountService = accountService;
         this.rentalManageService = rentalManageService;
         this.stockService = stockService;
@@ -67,7 +73,7 @@ public class RentalManageController {
     }
 
     @GetMapping("/rental/add")
-    public String add(Model model) {
+    public String add(@RequestParam(value = "stockId", required = false) String stockId, @RequestParam(value = "expectedRentalOn", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expectedRentalOn, Model model) {
         List<Account> accountList = this.accountService.findAll();
         List<Stock> stockList = this.stockService.findAll();
 
@@ -75,10 +81,19 @@ public class RentalManageController {
         model.addAttribute("stockList", stockList);
         model.addAttribute("rentalStatus", RentalStatus.values());
 
-        if (!model.containsAttribute("rentalManageDto")) {
-            model.addAttribute("rentalManageDto", new RentalManageDto());
+
+        RentalManageDto rentalManageDto = new RentalManageDto();
+        if (stockId != null && !stockId.isEmpty()) {
+            rentalManageDto.setStockId(stockId);
         }
 
+        if (expectedRentalOn != null) {
+            Date expectedRentalOnDate = Date.from(expectedRentalOn.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            rentalManageDto.setExpectedRentalOn(expectedRentalOnDate);
+        }
+
+        model.addAttribute("rentalManageDto", rentalManageDto);
+        
         return "rental/add";
     }
 

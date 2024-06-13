@@ -35,3 +35,11 @@
     padding: 5px;
     font-size: 14px;
 }
+
+#calendar_table tr.days th.saturday {
+    color: blue;
+}
+
+#calendar_table tr.days th.sunday {
+    color: red;
+}

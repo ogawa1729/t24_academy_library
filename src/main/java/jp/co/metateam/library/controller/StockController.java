@@ -121,14 +121,14 @@ public class StockController {
             // 登録処理
             stockService.update(id, stockDto);
 
-            return "stock/index";
+            return "redirect:/stock/index";
         } catch (Exception e) {
             log.error(e.getMessage());
 
             ra.addFlashAttribute("stockDto", stockDto);
             ra.addFlashAttribute("org.springframework.validation.BindingResult.stockDto", result);
 
-            return "redirect:/stock/edit";
+            return "stock/edit";
         }
     }
 
@@ -143,13 +143,13 @@ public class StockController {
         Integer daysInMonth = startDate.lengthOfMonth();
 
         List<Object> daysOfWeek = this.stockService.generateDaysOfWeek(targetYear, targetMonth, startDate, daysInMonth);
-        List<String> stocks = this.stockService.generateValues(targetYear, targetMonth, daysInMonth);
+        // List<String> books = this.stockService.
+        List<List<String>> stocks = this.stockService.generateValues(targetYear, targetMonth, daysInMonth);
 
         model.addAttribute("targetYear", targetYear);
         model.addAttribute("targetMonth", targetMonth);
         model.addAttribute("daysOfWeek", daysOfWeek);
         model.addAttribute("daysInMonth", daysInMonth);
-
         model.addAttribute("stocks", stocks);
 
         return "stock/calendar";
