@@ -1,11 +1,15 @@
 package jp.co.metateam.library.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
+import java.util.Map;
+import java.util.Date;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,18 +109,46 @@ public class StockService {
         return daysOfWeek;
     }
 
-    public List<String> generateValues(Integer year, Integer month, Integer daysInMonth) {
-        // FIXME ここで各書籍毎の日々の在庫を生成する処理を実装する
-        // FIXME ランダムに値を返却するサンプルを実装している
-        String[] stockNum = {"1", "2", "3", "4", "×"};
-        Random rnd = new Random();
-        List<String> values = new ArrayList<>();
-        values.add("スッキリわかるJava入門 第4版"); // 対象の書籍名
-        values.add("10"); // 対象書籍の在庫総数
+    public List<List<String>> generateValues(Integer year, Integer month, Integer daysInMonth) {
+        List<BookMst> books = this.bookMstRepository.findAll();
+        List<Map<String, Object>> availableStocks = this.stockRepository.findAvailableStocksByBook();
+        Map<String, Integer> availableStockCountMap = new HashMap<>();
         
-        for (int i = 1; i <= daysInMonth; i++) {
-            int index = rnd.nextInt(stockNum.length);
-            values.add(stockNum[index]);
+        Map<String, String> stockMngNumberMap = new HashMap<>();
+        for (Stock stock : stockRepository.findAll()) {
+            stockMngNumberMap.put(stock.getBookMst().getTitle(), stock.getId());
+        }
+
+
+        for (Map<String, Object> stockData : availableStocks) {
+            String bookTitle = (String) stockData.get("bookTitle");
+            Long stockCount = (Long) stockData.get("stockCount");
+            availableStockCountMap.put(bookTitle, stockCount.intValue());
+        }
+
+        List<List<String>> values = new ArrayList<>();
+        for (BookMst book : books) {
+           List<String> bookValues = new ArrayList<>();
+           bookValues.add(book.getTitle()); // 書籍名
+           int availableStockCount = availableStockCountMap.getOrDefault(book.getTitle(), 0);
+           bookValues.add(String.valueOf(availableStockCount)); // 利用可能在庫数
+
+           String stockMngNumber = stockMngNumberMap.getOrDefault(book.getTitle(), "");
+           bookValues.add(stockMngNumber);
+           
+           
+         for (int i = 1; i <= daysInMonth; i++) {
+             LocalDate localDate = LocalDate.of(year, month, i);
+             Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+             Long rentalCount = this.stockRepository.findByUnAvailableCount(date, book.getTitle());
+             int remainingStock = availableStockCount - rentalCount.intValue();
+                if (remainingStock <= 0) {
+                    bookValues.add("✖");
+                } else {
+                    bookValues.add(String.valueOf(remainingStock)); //貸出可能数
+                }
+            }
+            values.add(bookValues);
         }
         return values;
     }
